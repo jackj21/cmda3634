@@ -11,13 +11,13 @@ typedef struct Timestamp {
 /**
  * Prints the contents of the timestamp
  */
-int print_timestamp (Date a) {
+void print_timestamp (Date a) {
 	printf("Days: %d\n", a.days);
 	printf("Hours: %d\n", a.hours);
 	printf("Minutes: %d\n", a.minutes);
 	printf("Seconds: %d\n", a.seconds);
 
-	return 0;
+
 }
 
 Date timestamp_diff (Date a, Date b) {
@@ -34,9 +34,9 @@ Date timestamp_diff (Date a, Date b) {
 int main() {
 	Date jan;	
 	jan.days = 18666;
-	jan.hours = 447984;
-	jan.minutes = 26879040;
-	jan.seconds = 1612742400;
+	jan.hours = jan.days * 24;
+	jan.minutes = jan.hours * 60;
+	jan.seconds = jan.minutes * 60;
 	
 	print_timestamp(jan); 	
 
