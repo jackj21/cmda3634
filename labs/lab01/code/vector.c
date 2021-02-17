@@ -21,9 +21,12 @@ int initialize(Vector* u) {
  * being pointed to.
  */ 
 int inner_product(Vector* u, Vector* v, float* sum) {
+	// iterate through vectors x,y,z components and multiplies and stores value
+	float temp;
 	for (int i=0; i<3; ++i) {
-		*sum += u->data[i] * u->data[i];
+		temp += (u->data[i] * v->data[i]);
 	}
+	*sum = temp;
 
 	return 0;
 }
@@ -46,11 +49,11 @@ int normalize(Vector* u, float* length) {
 	if (*length == 0)
 		return 1;
 
-	// 	
+	// divides vectors x, y, and z components by length of vector to normalize it 	
 	u->data[0] = u->data[0] / *length;
 	u->data[1] = u->data[1] / *length;
 	u->data[2] = u->data[2] / *length;		
-
+	
 	return 0;
 }
 
@@ -133,7 +136,10 @@ int main() {
 
 	// iv)
 	// find a = <u, v>, inner product of u and v
-	
+	float a;
+	inner_product(&u, &v, &a);
+	printf("Inner product of vectors u and v:\n");
+	printf("a = %f\n", a);	
 
 	return 0;
 }
