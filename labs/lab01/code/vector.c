@@ -34,7 +34,7 @@ int inner_product(Vector* u, Vector* v, float* sum) {
 /**
  * Returns the Euclidian norm of a vector
  */ 
-int norm(Vector* u, Vector* v, float* norm) {
+int norm(Vector* u, float* norm) {
 	inner_product(u, u, norm);
 	*norm = sqrt(*norm);
 	return 0;
@@ -45,7 +45,7 @@ int norm(Vector* u, Vector* v, float* norm) {
  */ 
 int normalize(Vector* u) {
 	float length = 0.0;
-	norm(u, u, &length);
+	norm(u, &length);
 
 	if (length == 0)
 		return 1;
@@ -111,7 +111,7 @@ int main() {
 	// i)
 	// find m, the length of vector u, with norm function
 	float m;
-	norm(&u, &u, &m); 
+	norm(&u, &m); 
 	
 	// print length of vector u
 	printf("Length of vector u is: %f\n", m);
