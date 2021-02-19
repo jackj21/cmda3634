@@ -41,18 +41,19 @@ int norm(Vector* u, Vector* v, float* norm) {
 }
 
 /**
- * Modifies a given vector to have length1, in place
+ * Modifies a given vector to have length 1, in place
  */ 
-int normalize(Vector* u, float* length) {
-	norm(u, u, length);
+int normalize(Vector* u) {
+	float length = 0.0;
+	norm(u, u, &length);
 
-	if (*length == 0)
+	if (length == 0)
 		return 1;
 
 	// divides vectors x, y, and z components by length of vector to normalize it 	
-	u->data[0] = u->data[0] / *length;
-	u->data[1] = u->data[1] / *length;
-	u->data[2] = u->data[2] / *length;		
+	u->data[0] = u->data[0] / length;
+	u->data[1] = u->data[1] / length;
+	u->data[2] = u->data[2] / length;		
 	
 	return 0;
 }
@@ -140,6 +141,18 @@ int main() {
 	inner_product(&u, &v, &a);
 	printf("Inner product of vectors u and v:\n");
 	printf("a = %f\n", a);	
+
+	// v)
+	// u_hat = u / ||u||, a normalized version of vector u
+	normalize(&u);
+	printf("Normalized version of vector u:\n");
+	print(&u);
+
+	// vi)
+	// v_hat = v / ||v||, a normalized version of vector v
+	normalize(&v);
+	printf("Normalized version of vector v:\n");
+	print(&v);
 
 	return 0;
 }
