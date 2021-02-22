@@ -1,18 +1,55 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "vector.h"
 
 /**
  * Initializes the vector being pointed to to 0.
  */  
 int initialize(Vector* u) {
-	for (int i=0; i<3; ++i) {
+	for (int i=0; i<u->N; ++i) {
 		u->data[i] = 0.0;
 	}
 	
 	return 0;
 }
 
+/**
+ * Dynamically allocates a vector and its array.
+ *
+ * Returns:
+ * 		 1 if allocation did not work.
+ * 		 0 if allocation did work.
+ *
+ */
+int allocate(Vector* u, int N) {
+	u->data = malloc(N*sizeof(float));
+
+	if (u->data == NULL)
+		return 1;
+	
+	u->N = N;
+
+	return 0;
+
+}
+
+/**
+ * Deallocates a vector and empties its contents.
+ */
+int deallocate(Vector* u) {
+	
+	if (u->data == NULL){
+		u->N = 0;
+		return 0;	
+	}
+	
+	free(u->data);
+	u->data = NULL;
+	u->N = 0;
+
+	return 0;
+}
 /**
  * Returns the inner dot product of the 2 vectors
  * being pointed to.

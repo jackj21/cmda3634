@@ -2,10 +2,13 @@
 #define __VECTOR_H__
 
 typedef struct Vector_tag {
-	float data[3];
+	int N;
+	float* data;
 } Vector;
 
 int initialize(Vector* u);
+int allocate(Vector* u, int N);
+int deallocate(Vector* u);
 int inner_product(Vector* u, Vector* v, float* sum);
 int norm(Vector* u, float* norm);
 int normalize(Vector* u);
