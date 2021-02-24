@@ -11,8 +11,7 @@ int main(int argc, char* argv[]) {
 	Vector u;
 	Vector v;
 	
-	if (argc > 1)
-		printf("Too many arguments.\n");
+	
 	int N = 3; 
 
 	allocate(&u, N);
@@ -34,7 +33,7 @@ int main(int argc, char* argv[]) {
 	// i)
 	// find m, the length of vector u, with norm function
 	float m;
-	norm(&u, &m); 
+	m = norm(&u); 
 	
 	// print length of vector u
 	printf("Length of vector u is: %f\n", m);

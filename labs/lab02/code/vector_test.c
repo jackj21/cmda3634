@@ -35,6 +35,9 @@ void setup_normalize_test(Vector* vx, Vector* vy,
     allocate(vx, 5);
     allocate(v_ans, 5);
 
+    initialize(vx);
+    initialize(v_ans);
+
     vx->data[0] = 3.0;
     vx->data[1] = 3.0;
     vx->data[2] = 4.0;
@@ -49,6 +52,10 @@ void setup_normalize_test(Vector* vx, Vector* vy,
 
     allocate(vy, 37);
     allocate(v_zero, 37);
+
+    initialize(vy);
+    initialize(v_zero);
+
 }
 
 void teardown_normalize_test(Vector* vx, Vector* vy,
@@ -68,6 +75,11 @@ void setup_axpy_test(Vector* vx, Vector* vy, float* a,
     allocate(vy, n);
     allocate(v_ans, n);
     allocate(vz, n);
+
+    initialize(vx);
+    initialize(vy);
+    initialize(vz);
+    initialize(v_ans);
 
     *a = 0.137;
 
@@ -93,6 +105,9 @@ void setup_inner_product_test(Vector* vx, Vector* vy, float* s_ans){
 
     allocate(vx, n);
     allocate(vy, n);
+
+    initialize(vx);
+    initialize(vy);
 
     *s_ans = 0.0;
 
@@ -221,6 +236,10 @@ int main()
     allocate(&vy, 123);
     allocate(&vz, 12);
 
+    initialize(&vx);
+    initialize(&vy);
+    initialize(&vz);
+
     // Test 13
     tests[test_counter] = axpy(1.0, &vx, &vy, &vz);
     test_counter++;
@@ -230,6 +249,9 @@ int main()
 
     allocate(&vy, 12);
     allocate(&vz, 123);
+
+    initialize(&vy);
+    initialize(&vz);
 
     // Test 14
     tests[test_counter] = axpy(1.0, &vx, &vy, &vz);
@@ -256,6 +278,9 @@ int main()
 
     allocate(&vx, 12);
     allocate(&vy, 123);
+
+    initialize(&vx);
+    initialize(&vy);
 
     // Test 17
     tests[test_counter] = inner_product(&vx, &vy, &alpha);

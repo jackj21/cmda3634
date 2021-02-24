@@ -4,17 +4,6 @@
 #include "vector.h"
 
 /**
- * Initializes the vector being pointed to to 0.
- */  
-int initialize(Vector* u) {
-	for (int i = 0; i < u->N; ++i) {
-		u->data[i] = 0.0;
-	}
-	
-	return 0;
-}
-
-/**
  * Dynamically allocates a vector and its array.
  *
  * Returns:
@@ -50,17 +39,32 @@ int deallocate(Vector* u) {
 
 	return 0;
 }
+
+
+/**
+ * Initializes the vector being pointed to to 0.
+ */  
+int initialize(Vector* u) {
+	for (int i = 0; i < u->N; ++i) {
+		u->data[i] = 0.0;
+	}
+	
+	return 0;
+}
+
 /**
  * Returns the inner dot product of the 2 vectors
  * being pointed to.
  */ 
 int inner_product(Vector* u, Vector* v, float* sum) {
+	if (u->N != v->N)
+		return 1;
 	// iterate through vectors x,y,z components and multiplies and stores value
-	float temp;
+	*sum = 0.0;
 	for (int i = 0; i < u->N; ++i) {
-		temp += (u->data[i] * v->data[i]);
+		*sum += u->data[i] * v->data[i];
 	}
-	*sum = temp;
+	
 
 	return 0;
 }
@@ -68,21 +72,20 @@ int inner_product(Vector* u, Vector* v, float* sum) {
 /**
  * Returns the Euclidian norm of a vector
  */ 
-int norm(Vector* u, float*  norm) {
-	inner_product(u, u, norm);
-	*norm = sqrt(*norm);
+float norm(Vector* u) {
+	float ip;
+	inner_product(u, u, &ip);
 
-	return 0;
+	return sqrt(ip);
 }
 
 /**
  * Modifies a given vector to have length 1, in place
  */ 
 int normalize(Vector* u) {
-	float length;
-	norm(u, &length);
+	float length = norm(u);
 
-	if (length == 0)
+	if (length < 1e-7)
 		return 1;
 
 	// divides vectors x, y, and z components by length of vector to normalize it 
@@ -97,8 +100,9 @@ int normalize(Vector* u) {
  * Returns the result of the operation z = alpha * x + y 
  */
 int axpy(float a, Vector* u, Vector* v, Vector* z) {
-
-	for (int i = 0; i < u-> N; ++i){
+	if (u->N != v->N || u->N != z->N || v->N != z->N)
+		return 1; 
+	for (int i = 0; i < u->N; ++i){
 		z->data[i] = a*u->data[i] + v->data[i];
 	}
 	

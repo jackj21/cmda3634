@@ -6,11 +6,11 @@ typedef struct Vector_tag {
 	float* data;
 } Vector;
 
-int initialize(Vector* u);
 int allocate(Vector* u, int N);
 int deallocate(Vector* u);
+int initialize(Vector* u);
 int inner_product(Vector* u, Vector* v, float* sum);
-int norm(Vector* u, float* norm);
+float norm(Vector* u);
 int normalize(Vector* u);
 int axpy(float a, Vector* u, Vector* v, Vector* z);
 void print(Vector* u);
