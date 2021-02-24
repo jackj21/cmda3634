@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 	
 	if (argc > 1)
 		printf("Too many arguments.\n");
-	int N = *argv[1]; 
+	int N = 3; 
 
 	allocate(&u, N);
 	allocate(&v, N);
