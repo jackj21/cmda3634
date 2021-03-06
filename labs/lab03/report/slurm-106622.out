@@ -1,0 +1,7 @@
+Resetting modules to system default. Reseting $MODULEPATH back to system default. All extra directories will be removed from $MODULEPATH.
+gcc -o bin/axpy_random axpy_random.c vector.c
+gcc -o bin/axpy_normal axpy_normal.c vector.c
+Starting axpy_random...
+Ending axpy_random
+Starting axpy_normal...
+Ending axpy_normal
