@@ -10,11 +10,13 @@ typedef struct Grid_tag {
 
 } Grid;
 
-int allocate(Grid* a, unsigned int n_y, unsigned int n_x);
+int allocate(Grid* a, unsigned int ny, unsigned int nx);
 int deallocate(Grid* a);
 int initialize(Grid* a);
-int copy(Grid* a);
-int save(Grid* a);
+Grid* copy(Grid* a);
+int save(Grid* a, char** file_name);
+Grid* wave_eq(Grid* a, int t, int m_x, int m_y);
+Grid* timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, float dt);
 
 
 #endif
