@@ -1,4 +1,5 @@
 #include "grid.h"
+#include <stdbool.h>
 #include <math.h>
 #define PI 3.14159265358979323846
 
@@ -171,7 +172,7 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 			float y = j * d_y;
 			float x = i * d_x;
 			unsigned int ind = get_1D_index(j, i, a->n_x);
-			*(a->data) + ind = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
+			a->data[ind] = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
 			// a->data[ind] = ^^
 		}
 	}
