@@ -15,11 +15,11 @@
  * 		1 if allocation was not successful.
  */
 int allocate(Grid* a, unsigned int ny, unsigned int nx) {
-	a->data = malloc((a->ny)*(a->nx)*sizeof(float));
+	a->data = malloc((ny)*(nx)*sizeof(float));
 	
 	if (a->data == NULL) 
 		return 1;
-		
+	
 	a->n_y = ny;
 	a->n_x = nx;
 
@@ -80,7 +80,7 @@ int initialize(Grid* a) {
 	for (int i = 0; i<a->n_y; ++i) {
 		for (int j = 0; j<a->n_x; ++i) {
 		unsigned int index = get_1D_index(j, i, a->n_x);
-		*(a->data) + index = 0;	
+		a->data[index] = 0;	
 		}
 	}
 	return 0;
@@ -102,7 +102,7 @@ int copy(Grid* a, Grid* aCopy) {
 		return 1;
 	unsigned int length = (aCopy->n_y) * (aCopy->n_x);
 	for (int i =0; i < length; ++i) {
-		*(aCopy->data) + i = *(a->data) + i;
+		aCopy->data[i] = a->data[i];
 	}
 
 	return 0;	
@@ -168,14 +168,14 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 		
 	for (int j=0; j<(a->n_y); ++j) {
 		for (int i=0; i<(a->n_x); ++i) {
-			y = j * d_y;
-			x = i * d_x;
+			float y = j * d_y;
+			float x = i * d_x;
 			unsigned int ind = get_1D_index(j, i, a->n_x);
 			*(a->data) + ind = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
 			// a->data[ind] = ^^
 		}
 	}
-	return a;
+	return 0;
 }
 
 /**
@@ -193,7 +193,7 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
  * 		False if grid point is not a boundary point.
  */
 bool boundary_check(unsigned int n_y, unsigned int n_x, int j, int i) {
-	if (j == 0 || j == (n_y - 1) || i == 0 || i == (n_x - 1)
+	if (j == 0 || j == (n_y - 1) || i == 0 || i == (n_x - 1))
 		return true;
 	return false;	
 	
@@ -218,14 +218,14 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 	if (n_y == 0 || n_x == 0 || prev == NULL || curr == NULL || next == NULL) 
 		return 1;
 	
-	float d_x = 1 / (a->n_x - 1);
-	float d_y = 1 / (a->n_y - 1);
+	float d_x = 1 / (n_x - 1);
+	float d_y = 1 / (n_y - 1);
 
 	for (int j=0; j<(next->n_y); ++j) {
 		for (int i=0; i<(next->n_x); ++i) {
 			unsigned int ji = get_1D_index(j, i, next->n_x);
-			if (boundary_check(next->n_y, next->n_x, j, i)
-				*(next->data) + ji = 0;
+			if (boundary_check(next->n_y, next->n_x, j, i))
+				next->data[ji] = 0;
 			else {
 				unsigned int jm1i = get_1D_index(j-1, i, next->n_x);
 				unsigned int jim1 = get_1D_index(j, i-1, next->n_x);
@@ -233,14 +233,14 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 				unsigned int jip1 = get_1D_index(j, i+1, next->n_x);
 	
 				//           -4*curr[j][i]               curr[j-1][i]
-				lap = ((-4 * *(curr->data + ind)) + (*(curr->data) + jm1i)
+				lap = ((-4 * curr->data[ind])) + (curr->data[jm1i])
 				//			  curr[j][i-1]             curr[j+1][i]
-						+ (*(curr->data) + jim1) + (*(curr->data) + jp1i)
+						+ (curr->data[jim1]) + (curr->data[jp1i])
 				//            curr[j][i+1]           dx^2
-						+ (*(curr->data) + jip1) / pow(d_x, 2);
+						+ (curr->data[jip1]) / pow(d_x, 2);
 
 				//   next[j][i]        -prev [j][i]            2*curr[j][i]
-				*(next->data) + ji = (-*(prev->data) + ji) + (2*(*(curr->data) + ji))
+				next->data[ji] = (-(prev->data[ji]) + (2*(curr->data[ji]))
 					+ (pow(dt, 2) * lap));
 			}
 		}
