@@ -119,20 +119,30 @@ Grid* copy(Grid* a) {
  * 		0 if save is successful.
  * 		1 is save is unsuccessful due to Grid object or file pointer  being null.
  */
-int save(Grid* a, char** file_name) {
+int save(Grid* a, char* file_name) {
 	if (a == NULL) {
 		return 1;	
 	}
 	
-	FILE* f;
-	f = fopen(file_name, "wb");
+	FILE* fp;	
+	fp = fopen(file_name, "wb");
 
-	if (f = NULL)
+	if (fp = NULL)
 		return 1;
 	
-	fwrite(a, sizeof(a), 1, file_name);
+	char n_x[a->n_x];
+	char n_y[a->n_y];
+	itoa(a->n_x, n_x, 10);
+	itoa(a->n_y, n_y, 10);
+
+	fwrite(n_y, sizeof(unsigned int), 1, fp);
+	fwrite("\n", sizeof(char), 1, fp);
+	fwrite(n_x, sizeof(unsigned int), 1, fp);
+	fwrite("\n", sizeof(char), 1, fp);
+	fwrite(a, sizeof(a), 1, fp);
 	
-	fclose(f);
+	fclose(fp);
+	
 
 	return 0;
 	
@@ -150,21 +160,19 @@ int save(Grid* a, char** file_name) {
  * 		m_y: Number of stationary nodes on y-axis.
  *
  * Returns:
- * 		Pointer to Grid object that has wave equation 
- * 		evaluated and data stored.
+ * 		0 if wave equation successfully evaluated and stored into Grid.
+ * 		1 if evaluation runs into error.
  */
-Grid* wave_eq(Grid* a, int t, int m_x, int m_y) {
+int wave_eq(Grid* a, int t, int m_x, int m_y) {
 	float omega = PI * sqrt((pow(m_x, 2.0)) + (pow(m_y, 2.0)));
 	float d_x = 1 / (a->n_x - 1);
 	float d_y = 1 / (a->n_y - 1);
-
-	initialize(a);
-	
+		
 	for (int j=0; j<(a->n_y); ++j) {
 		for (int i=0; i<(a->n_x); ++i) {
 			y = j * d_y;
 			x = i * d_x;
-			unsigned int ind = get_1d_index(j, i, a->n_x);
+			unsigned int ind = get_1D_index(j, i, a->n_x);
 			*(a->data) + ind = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
 			// a->data[ind] = ^^
 		}
@@ -202,14 +210,16 @@ bool boundary_check(unsigned int n_y, unsigned int n_x, int j, int i) {
  * 		n_x: Number of columns:
  * 		prev: Previous time step.
  * 		curr: Current time step.
+ * 		next: Next time step.
  * 		dt: delta t.
  *
  * Returns:
- * 		The a pointer to next time step of the wave equation simulation,
- * 		stored in a Grid object.
+ * 		0 if timestep was properly computed.
+ * 		1 if timestep ran into an error.
  */ 
-Grid* timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, float dt) {
-	Grid* next = curr;
+int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* next, float dt) {
+	if (n_y == 0 || n_x == 0 || prev == NULL || curr == NULL || next == NULL) 
+		return 1;
 	
 	float d_x = 1 / (a->n_x - 1);
 	float d_y = 1 / (a->n_y - 1);
@@ -239,31 +249,66 @@ Grid* timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, float
 		}
 	}
 
-	return next;
+	return 0;
 }
 
 /**
  *
  */
-Grid* simulate(unsigned int T, unsigned int n, int m_x, int m_y) {	
+int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_y) {	
 	double alpha = 1.0;
 	float d_xy = 1 / (a->n - 1);
 	float dt = (alpha * d_xy) / sqrt(2);
-	
-	Grid prev;
-	Grid curr;
-	Grid next;
+	int n_t = round(T / dt);
+	int check = 0;
 
-	allocate(&prev, n, n); 		// ***Double check ny=nx=n for this task***
-	allocate(&curr, n, n);
-	nt = ...
+	Grid* prev;
+	Grid* curr;
+	Grid* next;
+	
+	check = allocate(prev, n_y, n_x); 	
+	if (check == 1)
+		return 1;	
+	
+	check = allocate(curr, n_y, n_x);
+	if (check == 1)
+		return 1;
+	
+	check = allocate(next, n_y, n_x); 
+	if (check == 1)
+		return 1;
+
+	// Initialize u_m1 and u_0
+	initialize(prev);
+	initialize(curr);
+	initialize(next);
+	
+	// Get initial conditions with t=-dt and t=0
+	wave_eq(prev, -dt, m_x, m_y);
+	wave_eq(curr, 0, m_x, m_y);
+
+	// SAVE PREV AND CURR TO FILES HERE...
+	// save(prev, n_t) n_t = -1 and 0?
+	// save(curr, n_t)
+	
+	// Run simulation...
+	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
 	//   start time
-	for (int i =0; i < nt; ++i)
-	
-	deallocate(&curr);
-	deallocate(&prev);
-	
+	for (int i =0; i < n_t; ++i) {
+		timestep(n_y, n_x, prev, curr, next, dt);
+		
+		char* file_name = calloc(i + 1, sizeof(char)); 
+		save(next, file_name);		
 
+		prev = copy(curr);
+		curr = copy(next);
+	}
+	
+	deallocate(next); 
+	deallocate(curr);
+	deallocate(prev);
+	
+	
 
 }
 
