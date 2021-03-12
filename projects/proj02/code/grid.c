@@ -92,20 +92,21 @@ int initialize(Grid* a) {
  *
  * Parameter:
  * 		a: Pointer to Grid object to be copied.
+ * 		aCopy: Pointer to Grid object where deep copy is stored.
  *
  * Returns:
- * 		A new array representing a deep copy of
- * 		the array passed in.
+ * 		0 if successfully copied Grid a.
+ * 		1 if a or aCopy are passed in as a NULL value.
  */
-Grid* copy(Grid* a) {
-	Grid* a_new;
-	allocate(a_new, a->n_y, a->nx);
-	unsigned int length = (a->n_y) * (a->n_x);
+int copy(Grid* a, Grid* aCopy) {
+	if (a == NULL || aCopy == NULL)
+		return 1;
+	unsigned int length = (aCopy->n_y) * (aCopy->n_x);
 	for (int i =0; i < length; ++i) {
-		*(a_new->data) + i = *(a->data) + i;
+		*(aCopy->data) + i = *(a->data) + i;
 	}
 
-	return a_new;	
+	return 0;	
 }
 
 /**
@@ -253,7 +254,20 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 }
 
 /**
+ * Simulates the wave equation with initial conditions u_m1 and u_0
+ * and saves data onto the disk in separate files according
+ * to iteration # with corresponding file names. 
  *
+ * Parameters:
+ * 		T: Final simulation time.
+ * 		n_y: Number of rows.
+ * 		n_x: Number of columns.
+ * 		m_x: Number of standing nodes.
+ * 		m_y: Number of standing nodes.
+ *
+ * Returns:
+ * 		0 if simulation ran correctly with no errors.
+ * 		1 if simulation ran into an error.
  */
 int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_y) {	
 	double alpha = 1.0;
@@ -290,18 +304,30 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	// SAVE PREV AND CURR TO FILES HERE...
 	// save(prev, n_t) n_t = -1 and 0?
 	// save(curr, n_t)
-	
+	char* file_name_m1 = calloc(13, sizeof(char));
+	char* file_name_0 = calloc(12, sizeof(char));
+	sprintf(file_name_m1, "Iteration#%d", -1);
+	sprintf(file_name_0, "Iteration#%d", 0);
+	save(prev, file_name_m1);
+	save(curr, file_name_0);
+
+	free(file_name_m1);
+	free(file_name_0);
+
 	// Run simulation...
 	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
 	//   start time
 	for (int i =0; i < n_t; ++i) {
 		timestep(n_y, n_x, prev, curr, next, dt);
-		
-		char* file_name = calloc(i + 1, sizeof(char)); 
+			
+		char* file_name = calloc(11 + n_t, sizeof(char)); 
+		sprintf(file_name, "Iteration#%d", i + 1);
 		save(next, file_name);		
 
-		prev = copy(curr);
-		curr = copy(next);
+		copy(curr, prev);
+		copy(next, curr);
+
+		free(file_name);
 	}
 	
 	deallocate(next); 
@@ -313,16 +339,3 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 }
 
 
-/**
- * QUESTIONS
- * 		1. How to check if functions are working as intended?
- *		2. Good framework?
- *		3. For save, to write as binary, do you just do fwrite(..."wb")?
- *		4. In the "Produce images of some solutions", when saving data files,
- *		is it implying we use our save method? And for the iteration number,
- *		should we have a global variable of some sort to keep track?
- *		5. Will simulate (task 4) return list of iterations, n_t, or something else?
- *		6. Task 4 - Do I allocate only 2 Grid data structs and then change their values
- *		for the simulation instead of creating new Grid data structs?
- *
- */ 
