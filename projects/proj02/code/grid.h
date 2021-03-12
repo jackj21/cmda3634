@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifndef __GRID_H__
+#define __GRID_H__
 
 typedef struct Grid_tag {
 	unsigned int n_y;	// unsigned int for number of rows
