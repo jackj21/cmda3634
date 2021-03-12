@@ -302,8 +302,8 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	// save(curr, n_t)
 	char* file_name_m1 = calloc(13, sizeof(char));
 	char* file_name_0 = calloc(12, sizeof(char));
-	sprintf(file_name_m1, "Iteration#%d", -1);
-	sprintf(file_name_0, "Iteration#%d", 0);
+	sprintf(file_name_m1, "Iteration#%d.bin", -1);
+	sprintf(file_name_0, "Iteration#%d.bin", 0);
 	save(prev, file_name_m1);
 	save(curr, file_name_0);
 
@@ -317,7 +317,7 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 		timestep(n_y, n_x, prev, curr, next, dt);
 			
 		char* file_name = calloc(11 + n_t, sizeof(char)); 
-		sprintf(file_name, "Iteration#%d", i + 1);
+		sprintf(file_name, "Iteration#%d.bin", i + 1);
 		save(next, file_name);		
 
 		copy(curr, prev);
