@@ -272,7 +272,7 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	double alpha = 1.0;
 	float d_y = 1 / (n_y - 1);
 	float d_x = 1 / (n_x - 1);
-	float dt = (alpha * d_xy) / sqrt(2);
+	float dt = (alpha * d_x) / sqrt(2);
 	int n_t = round(T / dt);
 	int check = 0;
 
