@@ -141,8 +141,8 @@ int save(Grid* a, char* file_name) {
 	itoa(a->n_y, n_y, 10);
 	**/
 	
-	char* nx = calloc(a->n_x * sizeof(unsigned int));
-	char* ny = calloc(a->n_y * sizeof(unsigned int));
+	char* nx = calloc((a->n_x) + 1, sizeof(unsigned int));
+	char* ny = calloc((a->n_y) + 1, sizeof(unsigned int));
 	sprintf(nx, "%d", a->n_x);
 	sprintf(ny, "%d", a->n_y);
 
