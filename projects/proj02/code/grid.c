@@ -1,5 +1,7 @@
 #include "grid.h"
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 #define PI 3.14159265358979323846
 
