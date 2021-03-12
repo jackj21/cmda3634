@@ -65,8 +65,8 @@ int deallocate(Grid* a) {
  * Returns:
  * 		1D index of a linear array.
  */
-unsigned int get_1D_index(unsigned int j, unsigned int i, unsigned int n_x) {
-	return j * n_x + i;
+int get_1D_index(unsigned int j, unsigned int i, unsigned int n_x) {
+	return (j * n_x) + i;
 		
 }
  
@@ -176,8 +176,8 @@ int save(Grid* a, char* file_name) {
  */
 int wave_eq(Grid* a, int t, int m_x, int m_y) {
 	float omega = PI * sqrt((pow(m_x, 2.0)) + (pow(m_y, 2.0)));
-	float d_x = 1 / (a->n_x - 1);
-	float d_y = 1 / (a->n_y - 1);
+	float d_x = 1.0 / (a->n_x - 1);
+	float d_y = 1.0 / (a->n_y - 1);
 		
 	for (int j=0; j<(a->n_y); ++j) {
 		for (int i=0; i<(a->n_x); ++i) {
@@ -185,7 +185,7 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 			float x = i * d_x;
 			unsigned int ind = get_1D_index(j, i, a->n_x);
 			a->data[ind] = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
-			// a->data[ind] = ^^
+			
 		}
 	}
 	return 0;
@@ -231,8 +231,8 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 	if (n_y == 0 || n_x == 0 || prev == NULL || curr == NULL || next == NULL) 
 		return 1;
 	
-	float d_x = 1 / (n_x - 1);
-	float d_y = 1 / (n_y - 1);
+	float d_x = 1.0 / (n_x - 1);
+	float d_y = 1.0 / (n_y - 1);
 
 	for (int j=0; j<(next->n_y); ++j) {
 		for (int i=0; i<(next->n_x); ++i) {
@@ -280,9 +280,9 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
  */
 int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_y) {	
 	double alpha = 1.0;
-	float d_y = 1 / (n_y - 1);
-	float d_x = 1 / (n_x - 1);
-	float dt = (alpha * d_x) / sqrt(2);
+	float d_y = 1.0 / (n_y - 1);
+	float d_x = 1.0 / (n_x - 1);
+	float dt = (alpha * d_x) / sqrt(2.0);
 	int n_t = round(T / dt);
 	int check = 0;
 
