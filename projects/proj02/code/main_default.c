@@ -1,4 +1,6 @@
 #include "grid.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
  * Main function that takes n, m_x, m_y, alpha, and T as
