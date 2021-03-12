@@ -15,7 +15,7 @@
  * 		1 if allocation was not successful.
  */
 int allocate(Grid* a, unsigned int ny, unsigned int nx) {
-	a->data = malloc((a->n_y)*(a->n_x)*sizeof(float));
+	a->data = malloc((a->ny)*(a->nx)*sizeof(float));
 	
 	if (a->data == NULL) 
 		return 1;
@@ -33,8 +33,7 @@ int allocate(Grid* a, unsigned int ny, unsigned int nx) {
  * 		a: Pointer to a Grid object to be deallocated.
  *
  * Returns:
- * 		0 if deallocation was successful.
- * 		1 if deallocation was not successful.
+ * 		0 to indicate completition of function..
  */
 int deallocate(Grid* a) {
 	if (a->data == NULL) {
@@ -81,7 +80,7 @@ int initialize(Grid* a) {
 	for (int i = 0; i<a->n_y; ++i) {
 		for (int j = 0; j<a->n_x; ++i) {
 		unsigned int index = get_1D_index(j, i, a->n_x);
-		*a->data + index = 0;	
+		*(a->data) + index = 0;	
 		}
 	}
 	return 0;
@@ -135,18 +134,16 @@ int save(Grid* a, char* file_name) {
 	char n_y[a->n_y];
 	itoa(a->n_x, n_x, 10);
 	itoa(a->n_y, n_y, 10);
-
+	
 	fwrite(n_y, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
 	fwrite(n_x, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
-	fwrite(a, sizeof(a), 1, fp);
+	fwrite(a->data, sizeof(a), 1, fp);
 	
 	fclose(fp);
 	
-
 	return 0;
-	
 }
 
 /**
@@ -179,7 +176,6 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 		}
 	}
 	return a;
-
 }
 
 /**
@@ -227,24 +223,24 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 
 	for (int j=0; j<(next->n_y); ++j) {
 		for (int i=0; i<(next->n_x); ++i) {
-			unsigned int ji = get_1d_index(j, i, next->n_x);
+			unsigned int ji = get_1D_index(j, i, next->n_x);
 			if (boundary_check(next->n_y, next->n_x, j, i)
 				*(next->data) + ji = 0;
 			else {
-				unsigned int jm1i = get_1d_index(j-1, i, next->n_x);
-				unsigned int jim1 = get_1d_index(j, i-1, next->n_x);
-				unsigned int jp1i = get_1d_index(j+1, i, next->n_x);
-				unsigned int jip1 = get_1d_index(j, i+1, next->n_x);
+				unsigned int jm1i = get_1D_index(j-1, i, next->n_x);
+				unsigned int jim1 = get_1D_index(j, i-1, next->n_x);
+				unsigned int jp1i = get_1D_index(j+1, i, next->n_x);
+				unsigned int jip1 = get_1D_index(j, i+1, next->n_x);
 	
 				//           -4*curr[j][i]               curr[j-1][i]
-				lap = ((-4 * (*curr->data + ind)) + (*curr->data + jm1i)
+				lap = ((-4 * *(curr->data + ind)) + (*(curr->data) + jm1i)
 				//			  curr[j][i-1]             curr[j+1][i]
-						+ (*curr->data + jim1) + (*curr->data + jp1i)
+						+ (*(curr->data) + jim1) + (*(curr->data) + jp1i)
 				//            curr[j][i+1]           dx^2
-						+ (*curr->data + jip1)) / pow(d_x, 2);
+						+ (*(curr->data) + jip1) / pow(d_x, 2);
 
 				//   next[j][i]        -prev [j][i]            2*curr[j][i]
-				*next->data + ji = (-(*prev->data + ji) + (2*(*curr->data + ji))
+				*(next->data) + ji = (-*(prev->data) + ji) + (2*(*(curr->data) + ji))
 					+ (pow(dt, 2) * lap));
 			}
 		}
@@ -334,7 +330,7 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	deallocate(curr);
 	deallocate(prev);
 	
-	
+		
 
 }
 
