@@ -132,18 +132,28 @@ int save(Grid* a, char* file_name) {
 
 	if (fp = NULL)
 		return 1;
-	
+	/**
+	 * itoa giving compiler error...trying to switch to sprintf
 	char n_x[a->n_x];
 	char n_y[a->n_y];
+
 	itoa(a->n_x, n_x, 10);
 	itoa(a->n_y, n_y, 10);
+	**/
 	
+	char* nx = calloc(a->n_x * sizeof(unsigned int));
+	char* ny = calloc(a->n_y * sizeof(unsigned int));
+	sprintf(nx, "%d", a->n_x);
+	sprintf(ny, "%d", a->n_y);
+
 	fwrite(n_y, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
 	fwrite(n_x, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
 	fwrite(a->data, sizeof(a), 1, fp);
 	
+	free(nx);
+	free(ny);
 	fclose(fp);
 	
 	return 0;
