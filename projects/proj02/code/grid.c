@@ -166,7 +166,7 @@ Grid* wave_eq(Grid* a, int t, int m_x, int m_y) {
 			x = i * d_x;
 			unsigned int ind = get_1d_index(j, i, a->n_x);
 			*(a->data) + ind = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
-
+			// a->data[ind] = ^^
 		}
 	}
 	return a;
@@ -241,3 +241,43 @@ Grid* timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, float
 
 	return next;
 }
+
+/**
+ *
+ */
+Grid* simulate(unsigned int T, unsigned int n, int m_x, int m_y) {	
+	double alpha = 1.0;
+	float d_xy = 1 / (a->n - 1);
+	float dt = (alpha * d_xy) / sqrt(2);
+	
+	Grid prev;
+	Grid curr;
+	Grid next;
+
+	allocate(&prev, n, n); 		// ***Double check ny=nx=n for this task***
+	allocate(&curr, n, n);
+	nt = ...
+	//   start time
+	for (int i =0; i < nt; ++i)
+	
+	deallocate(&curr);
+	deallocate(&prev);
+	
+
+
+}
+
+
+/**
+ * QUESTIONS
+ * 		1. How to check if functions are working as intended?
+ *		2. Good framework?
+ *		3. For save, to write as binary, do you just do fwrite(..."wb")?
+ *		4. In the "Produce images of some solutions", when saving data files,
+ *		is it implying we use our save method? And for the iteration number,
+ *		should we have a global variable of some sort to keep track?
+ *		5. Will simulate (task 4) return list of iterations, n_t, or something else?
+ *		6. Task 4 - Do I allocate only 2 Grid data structs and then change their values
+ *		for the simulation instead of creating new Grid data structs?
+ *
+ */ 
