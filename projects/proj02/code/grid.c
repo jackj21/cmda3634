@@ -18,7 +18,7 @@
  * 		1 if allocation was not successful.
  */
 int allocate(Grid* a, unsigned int ny, unsigned int nx) {
-	a->data = malloc((ny)*(nx)*sizeof(float));
+	a->data = (float*) malloc(ny*nx*sizeof(float));
 	
 	if (a->data == NULL) 
 		return 1;
@@ -80,8 +80,8 @@ unsigned int get_1D_index(unsigned int j, unsigned int i, unsigned int n_x) {
  * 		0 to signify initialization was successful.
  */
 int initialize(Grid* a) {
-	for (int i = 0; i<a->n_y; ++i) {
-		for (int j = 0; j<a->n_x; ++i) {
+	for (int j = 0; j<a->n_y; ++j) {
+		for (int i = 0; i<a->n_x; ++i) {
 		unsigned int index = get_1D_index(j, i, a->n_x);
 		a->data[index] = 0;	
 		}
@@ -146,9 +146,9 @@ int save(Grid* a, char* file_name) {
 	sprintf(nx, "%d", a->n_x);
 	sprintf(ny, "%d", a->n_y);
 
-	fwrite(n_y, sizeof(unsigned int), 1, fp);
+	fwrite(ny, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
-	fwrite(n_x, sizeof(unsigned int), 1, fp);
+	fwrite(nx, sizeof(unsigned int), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
 	fwrite(a->data, sizeof(a), 1, fp);
 	
@@ -313,7 +313,7 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 
 	// SAVE PREV AND CURR TO FILES HERE...
 	// save(prev, n_t) n_t = -1 and 0?
-	// save(curr, n_t)
+	// save(curr, n_t
 	char* file_name_m1 = calloc(13, sizeof(char));
 	char* file_name_0 = calloc(12, sizeof(char));
 	sprintf(file_name_m1, "Iteration#%d.bin", -1);
@@ -330,7 +330,7 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	for (int i =0; i < n_t; ++i) {
 		timestep(n_y, n_x, prev, curr, next, dt);
 			
-		char* file_name = calloc(11 + n_t, sizeof(char)); 
+		char* file_name = calloc(20 + n_t, sizeof(char)); 
 		sprintf(file_name, "Iteration#%d.bin", i + 1);
 		save(next, file_name);		
 
