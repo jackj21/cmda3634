@@ -236,7 +236,7 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 				unsigned int jip1 = get_1D_index(j, i+1, next->n_x);
 	
 				//           -4*curr[j][i]               curr[j-1][i]
-				lap = ((-4 * curr->data[ind])) + (curr->data[jm1i])
+				float lap = ((-4 * curr->data[ji])) + (curr->data[jm1i])
 				//			  curr[j][i-1]             curr[j+1][i]
 						+ (curr->data[jim1]) + (curr->data[jp1i])
 				//            curr[j][i+1]           dx^2
@@ -270,7 +270,8 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
  */
 int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_y) {	
 	double alpha = 1.0;
-	float d_xy = 1 / (a->n - 1);
+	float d_y = 1 / (n_y - 1);
+	float d_x = 1 / (n_x - 1);
 	float dt = (alpha * d_xy) / sqrt(2);
 	int n_t = round(T / dt);
 	int check = 0;
