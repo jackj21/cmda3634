@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #define PI 3.14159265358979323846
 
@@ -18,7 +19,7 @@
  * 		1 if allocation was not successful.
  */
 int allocate(Grid* a, unsigned int ny, unsigned int nx) {
-	a->data = (float*) malloc(ny*nx*sizeof(float));
+	a->data = malloc((ny*nx)*sizeof(float));
 	
 	if (a->data == NULL) 
 		return 1;
@@ -140,20 +141,24 @@ int save(Grid* a, char* file_name) {
 	itoa(a->n_x, n_x, 10);
 	itoa(a->n_y, n_y, 10);
 	**/
-	
-	char* nx = calloc((a->n_x) + 1, sizeof(unsigned int));
-	char* ny = calloc((a->n_y) + 1, sizeof(unsigned int));
-	sprintf(nx, "%d", a->n_x);
-	sprintf(ny, "%d", a->n_y);
+	unsigned int x = a->n_x;
+	unsigned int y = a->n_y;
 
-	fwrite(ny, sizeof(unsigned int), 1, fp);
+	//char* nx = calloc(x + 1, sizeof(char));
+	//char* ny = calloc(y + 1, sizeof(char));
+	char ny[2];
+	char nx[2];
+	sprintf(nx, "%d", x);
+	sprintf(ny, "%d", y);
+	
+	fwrite(ny, sizeof(ny), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
-	fwrite(nx, sizeof(unsigned int), 1, fp);
+	fwrite(nx, sizeof(nx), 1, fp);
 	fwrite("\n", sizeof(char), 1, fp);
 	fwrite(a->data, sizeof(a), 1, fp);
 	
-	free(nx);
-	free(ny);
+	//free(ny);
+	//free(nx);
 	fclose(fp);
 	
 	return 0;
@@ -286,63 +291,67 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	int n_t = round(T / dt);
 	int check = 0;
 
-	Grid* prev;
-	Grid* curr;
-	Grid* next;
+	Grid prev;
+	Grid curr;
+	Grid next;
 	
-	check = allocate(prev, n_y, n_x); 	
+	check = allocate(&prev, n_y, n_x); 	
 	if (check == 1)
 		return 1;	
 	
-	check = allocate(curr, n_y, n_x);
+	check = allocate(&curr, n_y, n_x);
 	if (check == 1)
 		return 1;
 	
-	check = allocate(next, n_y, n_x); 
+	check = allocate(&next, n_y, n_x); 
 	if (check == 1)
 		return 1;
 
 	// Initialize u_m1 and u_0
-	initialize(prev);
-	initialize(curr);
-	initialize(next);
+	initialize(&prev);
+	initialize(&curr);
+	initialize(&next);
 	
 	// Get initial conditions with t=-dt and t=0
-	wave_eq(prev, -dt, m_x, m_y);
-	wave_eq(curr, 0, m_x, m_y);
+	wave_eq(&prev, -dt, m_x, m_y);
+	wave_eq(&curr, 0, m_x, m_y);
 
 	// SAVE PREV AND CURR TO FILES HERE...
 	// save(prev, n_t) n_t = -1 and 0?
 	// save(curr, n_t
-	char* file_name_m1 = calloc(13, sizeof(char));
-	char* file_name_0 = calloc(12, sizeof(char));
-	sprintf(file_name_m1, "Iteration#%d.bin", -1);
-	sprintf(file_name_0, "Iteration#%d.bin", 0);
-	save(prev, file_name_m1);
-	save(curr, file_name_0);
+	//char* file_name_m1 = calloc(13, sizeof(char));
+	//char* file_name_0 = calloc(12, sizeof(char));
+	char file_name_m1[13];
+	char file_name_0[12];
+	
+	sprintf(file_name_m1, "%d.bin", -1);
+	//strcat(file_name_m1, bin, sizeof(bin));
+	sprintf(file_name_0, "%d.bin", 0);
+	save(&prev, &file_name_m1);
+	save(&curr, &file_name_0);
 
-	free(file_name_m1);
-	free(file_name_0);
+	//free(file_name_m1);
+	//free(file_name_0);
 
 	// Run simulation...
 	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
 	//   start time
 	for (int i =0; i < n_t; ++i) {
-		timestep(n_y, n_x, prev, curr, next, dt);
+		timestep(n_y, n_x, &prev, &curr, &next, dt);
 			
 		char* file_name = calloc(20 + n_t, sizeof(char)); 
 		sprintf(file_name, "Iteration#%d.bin", i + 1);
-		save(next, file_name);		
+		save(&next, file_name);		
 
-		copy(curr, prev);
-		copy(next, curr);
+		copy(&curr, &prev);
+		copy(&next, &curr);
 
 		free(file_name);
 	}
 	
-	deallocate(next); 
-	deallocate(curr);
-	deallocate(prev);
+	deallocate(&next); 
+	deallocate(&curr);
+	deallocate(&prev);
 	
 		
 
