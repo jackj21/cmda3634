@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #define PI 3.14159265358979323846
+
 
 /**
  * Dynamically allocates a two dimensional Grid data structure.
@@ -134,10 +136,15 @@ int save(Grid* a, char* file_name) {
 		unsigned int x = a->n_x;
 		unsigned int y = a->n_y;
 
-		char* nx = malloc((2) * sizeof(char));
-		char* ny = malloc((2) * sizeof(char));
-		nx[1] = '\0';
-		ny[1] = '\0';
+		int xDig = floor(log10(abs(x))) + 1;
+		int yDig = floor(log10(abs(y))) + 1;
+
+		//char* nx = malloc((xDig) * sizeof(char));
+		//char* ny = malloc((yDig + 1) * sizeof(char));
+		char nx[xDig];
+		char ny[yDig];
+		//nx[xDig] = '\0';
+		//ny[yDig] = '\0';
 	
 
 		sprintf(nx, "%d", x);
@@ -147,10 +154,17 @@ int save(Grid* a, char* file_name) {
 		fwrite("\n", sizeof(char), 1, fp);
 		fwrite(nx, sizeof(nx), 1, fp);
 		fwrite("\n", sizeof(char), 1, fp);
-		fwrite(a->data, sizeof(a), 1, fp);
+		for (int i=0; i<(x*y); ++i) {
+			int length = floor(log10(abs(a->data[i]))) + 1;
+			char data[length];
+			sprintf(data, "%f", a->data[i]);
+			fwrite(data, sizeof(float), 1, fp);
+			fwrite("\n", sizeof(char), 1, fp);
+			free(data);
+		}
 	
-		free(ny);
-		free(nx);
+		//free(ny);
+		//free(nx);
 		fclose(fp);
 		return 0;
 	}			
@@ -182,8 +196,8 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 			float y = j * d_y;
 			float x = i * d_x;
 			int ind = get_1D_index(j, i, a->n_x);
-			a->data[ind] = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
-			
+			float data = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
+			a->data[ind] = data;
 		}
 	}
 	return 0;
@@ -312,38 +326,42 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	// SAVE PREV AND CURR TO FILES HERE...
 	// save(prev, n_t) n_t = -1 and 0?
 	// save(curr, n_t
-	char* file_name_m1 = malloc(17 * sizeof(char));
-	char* file_name_0 = malloc(16 * sizeof(char));
+	//char* file_name_m1 = malloc(17 * sizeof(char));
+	//char* file_name_0 = malloc(16 * sizeof(char));
 	//char file_name_m1[13];
-	file_name_m1[16] = '\0';
+	//file_name_m1[16] = '\0';
 	//char file_name_0[12];
-	file_name_0[15] = '\0';
+	//file_name_0[15] = '\0';
 	
-	sprintf(file_name_m1, "Iteration#%d.bin", -1);
-	sprintf(file_name_0, "Iteration#%d.bin", 0);
+	//sprintf(file_name_m1, "Iteration#%d.bin", -1);
+	//sprintf(file_name_0, "Iteration#%d.bin", 0);
 
-	save(&prev, file_name_m1);
-	save(&curr, file_name_0);
+	//save(&prev, file_name_m1);
+	//save(&curr, file_name_0);
 
-	free(file_name_m1);
-	free(file_name_0);
+	//free(file_name_m1);
+	//free(file_name_0);
 
 	// Run simulation...
 	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
 	//   start time
+	clock_t start_t, end_t, total_t;
+	start_t = clock();
 	for (int i =0; i < n_t; ++i) {
 		timestep(n_y, n_x, &prev, &curr, &next, dt);
 			
-		char* file_name = calloc(20 + n_t, sizeof(char)); 
-		sprintf(file_name, "Iteration#%d.bin", i + 1);
-		save(&next, file_name);		
+		//char* file_name = calloc(20 + n_t, sizeof(char)); 
+		//sprintf(file_name, "Iteration#%d.bin", i + 1);
+		//save(&next, file_name);		
 
 		copy(&curr, &prev);
 		copy(&next, &curr);
 
-		free(file_name);
+		//free(file_name);
 	}
-	
+	end_t = clock();
+	total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+	printf("Total time taken to run: %f\n", total_t);
 	deallocate(&next); 
 	deallocate(&curr);
 	deallocate(&prev);

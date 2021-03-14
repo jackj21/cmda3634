@@ -1,6 +1,7 @@
 #include "grid.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 /**
  * Main function that takes n, m_x, m_y, alpha, and T as
@@ -12,7 +13,7 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	printf("Running %s...", argv[0]);
+	printf("Running %s...\n", argv[0]);
 
 	unsigned int n;
 	unsigned int m_x;
@@ -25,6 +26,12 @@ int main(int argc, char* argv[]) {
 	sscanf(argv[3], "%d", &m_y);
 	sscanf(argv[4], "%f", &alpha);
 	sscanf(argv[5], "%d", &T);
+	
+	clock_t start_t, end_t, total_t;
 
+	start_t = clock();
 	simulate(T, n, n, m_x, m_y);
+	end_t t= clock();
+	total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+	printf("Total time taken to run: %f\n", total_t);
 }
