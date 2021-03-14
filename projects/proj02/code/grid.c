@@ -345,8 +345,6 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	// Run simulation...
 	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
 	//   start time
-	clock_t start_t, end_t, total_t;
-	start_t = clock();
 	for (int i =0; i < n_t; ++i) {
 		timestep(n_y, n_x, &prev, &curr, &next, dt);
 			
@@ -359,9 +357,6 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 
 		//free(file_name);
 	}
-	end_t = clock();
-	total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
-	printf("Total time taken to run: %f\n", total_t);
 	deallocate(&next); 
 	deallocate(&curr);
 	deallocate(&prev);

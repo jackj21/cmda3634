@@ -13,7 +13,6 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	printf("Running %s...\n", argv[0]);
 
 	unsigned int n;
 	unsigned int m_x;
@@ -27,11 +26,13 @@ int main(int argc, char* argv[]) {
 	sscanf(argv[4], "%f", &alpha);
 	sscanf(argv[5], "%d", &T);
 	
-	clock_t start_t, end_t, total_t;
+	clock_t start_t, end_t;
 
 	start_t = clock();
 	simulate(T, n, n, m_x, m_y);
-	end_t t= clock();
-	total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
-	printf("Total time taken to run: %f\n", total_t);
+	end_t = clock();
+
+	double total_t = (double)(end_t - start_t) / (double)CLOCKS_PER_SEC;
+	
+	printf("%d, %f\n", n, total_t);
 }
