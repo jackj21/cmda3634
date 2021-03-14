@@ -83,7 +83,7 @@ int get_1D_index(unsigned int j, unsigned int i, unsigned int n_x) {
 int initialize(Grid* a) {
 	for (int j = 0; j<a->n_y; ++j) {
 		for (int i = 0; i<a->n_x; ++i) {
-		unsigned int index = get_1D_index(j, i, a->n_x);
+		int index = get_1D_index(j, i, a->n_x);
 		a->data[index] = 0;	
 		}
 	}
@@ -104,7 +104,7 @@ int initialize(Grid* a) {
 int copy(Grid* a, Grid* aCopy) {
 	if (a == NULL || aCopy == NULL)
 		return 1;
-	unsigned int length = (aCopy->n_y) * (aCopy->n_x);
+	int length = (aCopy->n_y) * (aCopy->n_x);
 	for (int i =0; i < length; ++i) {
 		aCopy->data[i] = a->data[i];
 	}
@@ -130,38 +130,31 @@ int save(Grid* a, char* file_name) {
 	
 	FILE* fp;	
 	fp = fopen(file_name, "wb");
+	if (fp != NULL) {	
+		unsigned int x = a->n_x;
+		unsigned int y = a->n_y;
 
-	if (fp = NULL)
-		return 1;
-	/**
-	 * itoa giving compiler error...trying to switch to sprintf
-	char n_x[a->n_x];
-	char n_y[a->n_y];
+		char* nx = malloc((2) * sizeof(char));
+		char* ny = malloc((2) * sizeof(char));
+		nx[1] = '\0';
+		ny[1] = '\0';
+	
 
-	itoa(a->n_x, n_x, 10);
-	itoa(a->n_y, n_y, 10);
-	**/
-	unsigned int x = a->n_x;
-	unsigned int y = a->n_y;
-
-	//char* nx = calloc(x + 1, sizeof(char));
-	//char* ny = calloc(y + 1, sizeof(char));
-	char ny[2];
-	char nx[2];
-	sprintf(nx, "%d", x);
-	sprintf(ny, "%d", y);
+		sprintf(nx, "%d", x);
+		sprintf(ny, "%d", y);
+		
+		fwrite(ny, sizeof(ny), 1, fp);
+		fwrite("\n", sizeof(char), 1, fp);
+		fwrite(nx, sizeof(nx), 1, fp);
+		fwrite("\n", sizeof(char), 1, fp);
+		fwrite(a->data, sizeof(a), 1, fp);
 	
-	fwrite(ny, sizeof(ny), 1, fp);
-	fwrite("\n", sizeof(char), 1, fp);
-	fwrite(nx, sizeof(nx), 1, fp);
-	fwrite("\n", sizeof(char), 1, fp);
-	fwrite(a->data, sizeof(a), 1, fp);
-	
-	//free(ny);
-	//free(nx);
-	fclose(fp);
-	
-	return 0;
+		free(ny);
+		free(nx);
+		fclose(fp);
+		return 0;
+	}			
+	return 1;
 }
 
 /**
@@ -188,7 +181,7 @@ int wave_eq(Grid* a, int t, int m_x, int m_y) {
 		for (int i=0; i<(a->n_x); ++i) {
 			float y = j * d_y;
 			float x = i * d_x;
-			unsigned int ind = get_1D_index(j, i, a->n_x);
+			int ind = get_1D_index(j, i, a->n_x);
 			a->data[ind] = sin(m_x * PI * x) * sin(m_y * PI * y) * cos(omega * t);
 			
 		}
@@ -241,14 +234,14 @@ int timestep(unsigned int n_y, unsigned int n_x, Grid* prev, Grid* curr, Grid* n
 
 	for (int j=0; j<(next->n_y); ++j) {
 		for (int i=0; i<(next->n_x); ++i) {
-			unsigned int ji = get_1D_index(j, i, next->n_x);
+			int ji = get_1D_index(j, i, next->n_x);
 			if (boundary_check(next->n_y, next->n_x, j, i))
 				next->data[ji] = 0;
 			else {
-				unsigned int jm1i = get_1D_index(j-1, i, next->n_x);
-				unsigned int jim1 = get_1D_index(j, i-1, next->n_x);
-				unsigned int jp1i = get_1D_index(j+1, i, next->n_x);
-				unsigned int jip1 = get_1D_index(j, i+1, next->n_x);
+				int jm1i = get_1D_index(j-1, i, next->n_x);
+				int jim1 = get_1D_index(j, i-1, next->n_x);
+				int jp1i = get_1D_index(j+1, i, next->n_x);
+				int jip1 = get_1D_index(j, i+1, next->n_x);
 	
 				//           -4*curr[j][i]               curr[j-1][i]
 				float lap = ((-4 * curr->data[ji])) + (curr->data[jm1i])
@@ -319,19 +312,21 @@ int simulate(unsigned int T, unsigned int n_y, unsigned int n_x, int m_x, int m_
 	// SAVE PREV AND CURR TO FILES HERE...
 	// save(prev, n_t) n_t = -1 and 0?
 	// save(curr, n_t
-	//char* file_name_m1 = calloc(13, sizeof(char));
-	//char* file_name_0 = calloc(12, sizeof(char));
-	char file_name_m1[13];
-	char file_name_0[12];
+	char* file_name_m1 = malloc(17 * sizeof(char));
+	char* file_name_0 = malloc(16 * sizeof(char));
+	//char file_name_m1[13];
+	file_name_m1[16] = '\0';
+	//char file_name_0[12];
+	file_name_0[15] = '\0';
 	
-	sprintf(file_name_m1, "%d.bin", -1);
-	//strcat(file_name_m1, bin, sizeof(bin));
-	sprintf(file_name_0, "%d.bin", 0);
-	save(&prev, &file_name_m1);
-	save(&curr, &file_name_0);
+	sprintf(file_name_m1, "Iteration#%d.bin", -1);
+	sprintf(file_name_0, "Iteration#%d.bin", 0);
 
-	//free(file_name_m1);
-	//free(file_name_0);
+	save(&prev, file_name_m1);
+	save(&curr, file_name_0);
+
+	free(file_name_m1);
+	free(file_name_0);
 
 	// Run simulation...
 	// IMPLEMENT CLOCK IN TIME.H HERE? look at analysis...
