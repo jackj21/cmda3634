@@ -21,13 +21,16 @@ int main(int argc, char **argv){
 
 
     // Parallelize random number generation
-    // TODO
-    struct drand48_data rand_buffer;
-    int seed = time(NULL);
+	struct drand48_data rand_buffer;
+	int seed = time(NULL);
+#pragma omg parallel default(none) private(rand_buffer,n) shared(n_tests,n_inside)
+	{
+	int thread_id = omp_get_thread_num();
+	int seed = time(NULL) + thread_id;		
     srand48_r(seed, &rand_buffer);
 
     // Parallelize the loop
-    // TODO
+#pragma omp for reduction(+:n_inside)
     for(n=0; n < n_tests; ++n){
         double x;
         double y;
@@ -36,21 +39,20 @@ int main(int argc, char **argv){
         drand48_r(&rand_buffer, &y);
 
         // Check to see if radius is less than 1
-        // TODO
-        if(1){
+        if((pow(x, 2) + pow(y, 2)) < 1){
             n_inside++;
         }
     }
 
+	}
     // Divide area of circle by area of square
-    // TODO
-    estpi = 0;
+    estpi = 4 * (double)n_inside / (double)n_tests;
 
     double toc = omp_get_wtime();
     double elapsed = toc - tic;
     
-    printf("estPi = %lf\n", estpi);
-    printf("dt = %f\n", elapsed);
+	printf("%d, %d, %lf, %lf\n", n_threads, n_tests, estpi, elapsed);
+
 
 
     return 0;
