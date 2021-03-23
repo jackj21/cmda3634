@@ -33,7 +33,7 @@ int main(int argc, char **argv){
     	srand48_r(seed, &rand_buffer);
 	
     // Parallelize the loop
-#pragma omp parallel for reduction(+:n_inside)
+#pragma omp for reduction(+:n_inside)
     for(n=0; n < n_tests; ++n){
         double x;
         double y;
