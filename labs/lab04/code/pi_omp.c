@@ -6,10 +6,12 @@
 
 int main(int argc, char **argv){
 
-    long long int n_tests = atoll(argv[1]);
+    long long int n_tests = atoll(argv[2]);
 
     // Take number of Ope threads as a command line argument
-    int n_threads = atoi(argv[2]);
+    int n_threads = atoi(argv[1]);
+	omp_set_num_threads(n_threads);
+	// **Number of sample points N and number of threads T
 
     double tic = omp_get_wtime();
 
@@ -23,14 +25,15 @@ int main(int argc, char **argv){
     // Parallelize random number generation
 	struct drand48_data rand_buffer;
 	int seed = time(NULL);
-#pragma omg parallel default(none) private(rand_buffer,n) shared(n_tests,n_inside)
-	{
-	int thread_id = omp_get_thread_num();
-	int seed = time(NULL) + thread_id;		
-    srand48_r(seed, &rand_buffer);
 
+#pragma omp parallel default(none) private(rand_buffer,n) shared(n_tests,n_inside)
+	{
+		int thread_id = omp_get_thread_num();
+		int seed = time(NULL) + thread_id;		
+    	srand48_r(seed, &rand_buffer);
+	
     // Parallelize the loop
-#pragma omp for reduction(+:n_inside)
+#pragma omp parallel for reduction(+:n_inside)
     for(n=0; n < n_tests; ++n){
         double x;
         double y;
@@ -44,15 +47,15 @@ int main(int argc, char **argv){
         }
     }
 
-	}
+	} // end parallel region
     // Divide area of circle by area of square
     estpi = 4 * (double)n_inside / (double)n_tests;
 
     double toc = omp_get_wtime();
     double elapsed = toc - tic;
     
-	printf("%d, %d, %lf, %lf\n", n_threads, n_tests, estpi, elapsed);
-
+	printf("%d, %llu, %lf, %lf\n", n_threads, n_tests, estpi, elapsed);
+	
 
 
     return 0;
