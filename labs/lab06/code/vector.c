@@ -161,8 +161,6 @@ int distributed_print_Vector(Vector* v_local){
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
 
-	int n = v_local->N;
-	
 	for (int i = 0; i<n_procs; i++) {
 	
 		if (rank == i) {
@@ -184,22 +182,48 @@ int distributed_print_Vector(Vector* v_local){
 int gather_Vector(Vector* v, Vector* v_local){
 
     // ***************STUDENT CODE GOES HERE******************
-	MPI Status status;
+	MPI_Status status;
 	int tag = 0;
 	int n_procs;
 	int rank;
+	int N_global;
+	int N_local;
+
 
 	MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-	for (int i = 0; i<n_procs; i++) {
-		if (rank == i) {
-			for (int idx = 0; idx < v_local->N; idx++) {
-				MPI_Send(&(v_local->data[idx]), v_local->N, MPI_FLOAT, 0, tag, MPI_COMM_WORLD);
-			}
-			MPI_Recv(&(v->data[i*v_local->N]), v_local->N, MPI_FLOAT, rank, tag, MPI_COMM_WORLD, &status);
+	//int src_rank = (rank - 1) % n_procs;
+
+	//if (rank == 0) {
+		//N_global = v_local->N;
+	//	MPI_Recv(&N_local, 1, MPI_INT, src_rank, tag, MPI_COMM_WORLD, &status);	
+	//	N_global += N_local;	
+	//}
+	//else {
+	//	N_local = v_local->N;
+	//	MPI_Send(&N_local, 1, MPI_INT, 0, tag, MPI_COMM_WORLD);
+	//}
+	N_global = v->N;
+	N_local = v_local->N;
+	
+	if (rank == n_procs-1) N_local += N_global % n_procs;
+	
+	int idx = N_global / n_procs;
+			
+	if (rank > 0) {	
+			MPI_Send(&(v_local->data[0]), N_local, MPI_FLOAT, 0, tag, MPI_COMM_WORLD);
+	}
+	
+	else if (rank == 0) {	
+		int start_idx;
+		for (int i = 0; i<N_local; i++) {
+			v->data[i] = v_local->data[i];
 		}
-		MPI_Barrier(MPI_COMM_WORLD);
+		for (int src_rank=1; src_rank < n_procs; src_rank++) {
+			start_idx = src_rank * idx;
+			MPI_Recv(&(v->data[start_idx]), N_local, MPI_FLOAT, src_rank, tag, MPI_COMM_WORLD, &status);		
+		}
 	}
     // **************STUDENT CODE STOPS HERE*******************
 
@@ -229,7 +253,17 @@ int distributed_axpy(float alpha, Vector* vx, Vector* vy){
 
     // do the axpy on the data subset of interest
     // ******STUDENT CODE GOES HERE*************
+	int n_procs, rank;
+	MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	
+	for (int i = 0; i < n_procs; i++) {
+		if (rank == i) {
+			for (int idx = 0; idx < N_local; idx++) {
+				vy_local.data[idx] = alpha * vx_local.data[idx]	+ vy_local.data[idx];
+			}
+		}
+	}
     // ******STUDENT CODE STOPS HERE*************
 
     // collect the updated information from all the processes into vx and vy on rank 0

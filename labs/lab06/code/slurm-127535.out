@@ -1,0 +1,13 @@
+rm -f test_print_vector
+rm -f test_distributed_axpy
+rm -f time_distributed_axpy
+rm -f *.o
+mpicc  -o time_distributed_axpy time_distributed_axpy.c vector.c -lm
+strong scalability
+==================
+
+
+weak scalability
+==================
+
+

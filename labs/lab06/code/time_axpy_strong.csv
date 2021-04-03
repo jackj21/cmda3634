@@ -1,0 +1,10 @@
+experiment, n_procs, n_trials, N, avg_time
+axpy vector,    1,    5, 10000000, 0.1450521668 
+axpy vector,    2,    5, 10000000, 0.0779271134 
+axpy vector,    4,    5, 10000000, 0.0425060228 
+axpy vector,    8,    5, 10000000, 0.0315947780 
+axpy vector,   16,    5, 10000000, 0.0310882238 
+axpy vector,   32,    5, 10000000, 0.0955202110 
+axpy vector,   64,    5, 10000000, 0.0399745328 
+axpy vector,  128,    5, 10000000, 0.0522744330 
+axpy vector,  256,    5, 10000000, 0.0432527700 
