@@ -32,7 +32,7 @@ int main(int argc, char** argv){
 
     float alpha = atof(argv[4]);
 	
-	int n_threads = atoi(argv[8]);
+	int n_threads = atoi(argv[7]);
 	omp_set_num_threads(n_threads);
 
     // Perform the task.
