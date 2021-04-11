@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <omp.h>
 
 #include "array_2d.h"
 #include "wave.h"

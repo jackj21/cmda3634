@@ -297,12 +297,11 @@ float norm_error(Array2D_f* u_sim, Array2D_f* u_true, unsigned int nx, unsigned 
 	float error = 0.0;
 	float c = 1.0 / (float)(nx * ny);
 
-#pragma omp parallel for default(none) shared(u_sim,u_true,nx,ny) reduction(+:error)
+#pragma omp parallel for default(none) shared(u_sim,u_true,nx,ny) reduction(+:error) 
 	for (int j=0; j<ny-1; j++) {
 		for (int i=0; i<nx-1; i++) {
 			int idx = ji_to_idx(j, i, nx);
-			error = error + ((u_sim->data[idx] - u_true->data[idx]) * (u_sim->data[idx] - 
-					u_true->data[idx]));
+			error = error + ((u_sim->data[idx] - u_true->data[idx]) * (u_sim->data[idx] - u_true->					  data[idx]));
 		}
 	}
 
