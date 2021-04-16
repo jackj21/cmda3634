@@ -199,15 +199,14 @@ int log_sum_reduction(const float* val, float* reducedval, MPI_Comm comm){
 	
 	int tag = 0;
 	int rank, n_procs;
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	MPI_Comm_size(MPI_COMM_WORLD, &n_procs);
+	MPI_Comm_rank(comm, &rank);
+	MPI_Comm_size(comm, &n_procs);
 	MPI_Status status;
 	
-	float redval = *reducedval;
+	//float redval = *reducedval;
 	float normval = *val;
 	float recvval;
 	
-
 	int stride, level;
 	stride = pow(2, (int)floor(log2(n_procs)));
 	level = (int)floor(log2(n_procs)) + 1;
@@ -239,7 +238,42 @@ int log_sum_reduction(const float* val, float* reducedval, MPI_Comm comm){
 
 
 int log_broadcast(float* val, MPI_Comm comm){
+	
+	int tag = 0;
+	int rank, n_procs;
+	MPI_Comm_rank(comm, &rank);
+	MPI_Comm_size(comm, &n_procs);
+	MPI_Status status;
+	
+	float data;
 
+	if (rank == 0) data = *val;
+	//printf("Before Bcast Rank %d: Value = %f.\n", rank, data);
+	
+	int level, partner, stride;
+	level = 1;
+	stride = 1;
+	
+	while (stride < n_procs) {
+		if (rank < 2*stride) {
+			if (rank < stride) {
+				partner = rank + stride;
+				if (partner < n_procs) {
+					//printf("Level %d (%d): %d sends to %d\n", level, stride, rank, partner);	
+					MPI_Send(&data, 1, MPI_FLOAT, partner, 0, comm);
+				}
+			}
+			else {
+				partner = rank - stride;
+				//printf("Level %d (%d): %d recv from %d\n", level, stride, rank, partner);
+				MPI_Recv(&data, 1, MPI_FLOAT, partner, 0, comm, &status);
+			}
+		}
+		stride *= 2;
+		level += 1;
+	}
+	//printf("After Bcast Rank %d: value = %f.\n", rank, data);
+	*val = data;
 
     return 0;
 }
@@ -259,10 +293,10 @@ int inner_product_manual(Vector* vx, Vector* vy, float* ip) {
     if (vx->N != vy->N) return 1;
 
     for(i=0; i < N; i++){	
-        result = vx_data[i]*vy_data[i];
+        result += vx_data[i]*vy_data[i];
     }
 
-	log_sum_reduction(&result, ip, MPI_COMM_WORLD);
+	log_sum_reduction(&result, ip, vx->comm);
     return 0;
 }
 
@@ -284,7 +318,7 @@ int inner_product_mpi(Vector* vx, Vector* vy, float* ip) {
     	result += vx_data[i]*vy_data[i];
 
     }
-	MPI_Reduce(&result, ip, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+	MPI_Reduce(&result, ip, 1, MPI_FLOAT, MPI_SUM, 0, vx->comm);
 
     return 0;
 }
@@ -311,7 +345,7 @@ int normalize_serial(Vector* v) {
     int i;
     int N = v->N;
     float* v_data = v->data;
-
+	
     float length = norm(v);
 
     // Zero vector, nothing to do.
@@ -332,13 +366,20 @@ int normalize_manual(Vector* v) {
 
     float local_length;
     float length;
+	local_length = pow(norm(v), 2);
 
+	log_sum_reduction(&local_length, &length, MPI_COMM_WORLD);  
+	log_broadcast(&length, MPI_COMM_WORLD);	
+	length = sqrt(length);
     // Zero vector, nothing to do.
     if( abs(length) < 1e-5 ) return 0;
 
     for(i=0; i < N; i++){
         v_data[i] /= length;
     }
+
+	
+	
 
     return 0;
 }
@@ -351,8 +392,14 @@ int normalize_mpi2(Vector* v) {
 
     float local_length;
     float length;
-
-    // Zero vector, nothing to do.
+	
+	local_length = pow(norm(v), 2);
+	
+	MPI_Reduce(&local_length, &length, 1, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+	MPI_Bcast(&length, 1, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	length = sqrt(length);
+    
+	// Zero vector, nothing to do.
     if( abs(length) < 1e-5 ) return 0;
 
     for(i=0; i < N; i++){
@@ -370,6 +417,12 @@ int normalize_mpi1(Vector* v) {
 
     float local_length;
     float length;
+	
+	local_length = pow(norm(v), 2);
+
+	MPI_Allreduce(&local_length, &length, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+
+	length = sqrt(length);
 
     // Zero vector, nothing to do.
     if( abs(length) < 1e-5 ) return 0;
