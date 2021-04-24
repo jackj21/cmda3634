@@ -305,22 +305,18 @@ int update_padding_ghost_exchange_Vector(Vector* v){
     
 	// receive from previous (up) rank
 	if (rank > 0) {
-		printf("recv from prev up rank\n");
 		MPI_Irecv(prev_fill, p, MPI_FLOAT, rank-1, 0, v->comm, &requests[0]); 
     }
 	// receive from next (down) rank
 	if (rank < size-1) {
-		printf("recv from next down rank\n");
 		MPI_Irecv(next_fill, p, MPI_FLOAT, rank+1, 1, v->comm, &requests[1]);
     }
 	// send to previous (up) rank
 	if (rank > 0) {
-		printf("send to prev up rank\n");
 		MPI_Isend(prev_send, p, MPI_FLOAT, rank-1, 1, v->comm, &requests[2]);
     }
 	// send to next (down)rank
 	if (rank < size-1) {
-		printf("send to down rank\n");
 		MPI_Isend(next_send, p, MPI_FLOAT, rank+1, 0, v->comm, &requests[3]);
     }
 	// make sure all the requests are done
