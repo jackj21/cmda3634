@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-pid=`whoami`
+pid=`jackj21`
 
 work_path=/work/$pid/temp
 

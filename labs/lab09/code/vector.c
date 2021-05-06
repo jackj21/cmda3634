@@ -384,7 +384,6 @@ int c_mpi_read_Vector(Vector* v, const char* filename, MPI_Comm comm){
 			n_read_data = fread(buffer, sizeof(float), n_data, f);
 			if (n_read_data != n_data) {
 				fprintf(stderr, "Error reading file %s data.\n", filename);
-				free(buffer);
 				return 1;
 			}
 			MPI_Send(buffer, n_data, MPI_FLOAT, p, 0, comm); 
@@ -398,7 +397,7 @@ int c_mpi_read_Vector(Vector* v, const char* filename, MPI_Comm comm){
     // Get my local data from the process doing the reading
 	else {
 		allocate_Vector(v, n_data, 0, comm);
-		MPI_Recv(v->data, n_data, MPI_FLOAT, 0, 0, comm, &status);
+		MPI_Recv(v->data, v->N_padded, MPI_FLOAT, 0, 0, comm, &status);
 	}	
     // </student>
     return 0;
@@ -579,14 +578,48 @@ int mpi_write_Vector(Vector* v, const char* filename){
 	int rank, size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    // Write the header
 	
+	MPI_File f;
+	MPI_Status status;
+	MPI_Offset offset;
+	unsigned int n_data;
+	int n_write_data;
+	
+	// Write the header
+	unsigned int header_size = sizeof(unsigned int);
+
+	if (rank == 0) {
+		FILE* f = fopen(filename, "wb");
+		if (f == NULL) {
+			fprintf(stderr, "Error opening file %s for read.\n", filename);
+			return 1;	
+		}
+
+		n_write_data = fwrite(&v->N_global, sizeof(int), 1, f);
+		if (n_write_data != 1) {
+			fprintf(stderr, "Error writing file %s header.\n", filename);
+			return 1;
+		}
+		fclose(f);
+	}
     // Open the file
+	MPI_File_open(MPI_COMM_WORLD, filename, MPI_MODE_WRONLY, MPI_INFO_NULL, &f);
+
     // Compute offset for my write
+	offset = header_size + sizeof(float)*v->r0;
+
     // Write data to file in parallel
+	MPI_File_write_at_all(f, offset, v->data, v->N_padded, MPI_FLOAT, &status);
+
     // Verify that required data has been written
+	MPI_Get_count(&status, MPI_FLOAT, &n_write_data);
+	if (n_write_data != v->N_padded) {
+		fprintf(stderr, "Error writing file %s data for rank %d. Got %d expected %d.\n", filename, rank, n_write_data, v->N_padded);
+		return 1;
+	}
+
     // Close the file
+	MPI_File_close(&f);
 
     // </student>
 

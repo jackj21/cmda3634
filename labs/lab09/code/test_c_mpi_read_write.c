@@ -37,8 +37,6 @@ int main(int argc, char** argv){
         sprintf(fname, "%s/baseline_%d.data", path, logsizes[i]);
         c_mpi_write_Vector(&v, fname);
 
-		print_Vector(&v);
-
         Vector u;
 
         c_mpi_read_Vector(&u, fname, v.comm);

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pid=`whoami`
+pid=`jackj21`
 
 #home_path=/home/$pid/temp
 work_path=/work/$pid/temp

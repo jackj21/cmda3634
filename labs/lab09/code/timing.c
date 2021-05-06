@@ -91,70 +91,70 @@ int main(int argc, char** argv){
     }
 
 
-    if(n_procs > 1){
+//    if(n_procs > 1){
 
-    double c_mpi_write_start[n_sizes], c_mpi_write_stop[n_sizes], c_mpi_write_time[n_sizes];
+//    double c_mpi_write_start[n_sizes], c_mpi_write_stop[n_sizes], c_mpi_write_time[n_sizes];
 
-    for (int k=0; k<n_trials; k++){
-        for(int i=0; i<n_sizes; i++){
-            Vector v;
-            int N = sizes[i];
-            allocate_Vector(&v, N, 0, MPI_COMM_WORLD);
+  //  for (int k=0; k<n_trials; k++){
+    //    for(int i=0; i<n_sizes; i++){
+      //      Vector v;
+        //    int N = sizes[i];
+          //  allocate_Vector(&v, N, 0, MPI_COMM_WORLD);
 
-            rand_fill_Vector(&v);
+//            rand_fill_Vector(&v);
 
-            char fname[500];
-            sprintf(fname, "%s/baseline_%d.data", path, logsizes[i]);
+  //          char fname[500];
+    //        sprintf(fname, "%s/baseline_%d.data", path, logsizes[i]);
 
-            MPI_Barrier(MPI_COMM_WORLD);
-            c_mpi_write_start[i] = MPI_Wtime();
-            c_mpi_write_Vector(&v, fname);
-            MPI_Barrier(MPI_COMM_WORLD);
-            c_mpi_write_stop[i] = MPI_Wtime();
-            c_mpi_write_time[i] += c_mpi_write_stop[i] - c_mpi_write_start[i];
+      //      MPI_Barrier(MPI_COMM_WORLD);
+        //    c_mpi_write_start[i] = MPI_Wtime();
+        //    c_mpi_write_Vector(&v, fname);
+        //    MPI_Barrier(MPI_COMM_WORLD);
+        //    c_mpi_write_stop[i] = MPI_Wtime();
+        //    c_mpi_write_time[i] += c_mpi_write_stop[i] - c_mpi_write_start[i];
 
-            deallocate_Vector(&v);
-        }
-    }
+        //    deallocate_Vector(&v);
+        //}
+    //}
 
-    if(rank == 0){
-        printf("c-mpi write,  %d ", n_procs);
-        for(int i=0; i<n_sizes; i++){
-            c_mpi_write_time[i] /= n_trials;
-            printf("%f,\t", c_mpi_write_time[i]);
-        }
-        printf("\n");
-    }
+    //if(rank == 0){
+    //    printf("c-mpi write,  %d ", n_procs);
+    //    for(int i=0; i<n_sizes; i++){
+    //        c_mpi_write_time[i] /= n_trials;
+    //        printf("%f,\t", c_mpi_write_time[i]);
+    //    }
+    //    printf("\n");
+    //}
 
-    double c_mpi_read_start[n_sizes], c_mpi_read_stop[n_sizes], c_mpi_read_time[n_sizes];
+    //double c_mpi_read_start[n_sizes], c_mpi_read_stop[n_sizes], c_mpi_read_time[n_sizes];
 
-    for (int k=0; k<n_trials; k++){
-        for(int i=0; i<n_sizes; i++){
-            Vector v;
-            int N = sizes[i];
+    //for (int k=0; k<n_trials; k++){
+    //    for(int i=0; i<n_sizes; i++){
+    //        Vector v;
+    //        int N = sizes[i];
 
-            char fname[500];
-            sprintf(fname, "%s/baseline_%d.data", path, logsizes[i]);
+      //      char fname[500];
+      //      sprintf(fname, "%s/baseline_%d.data", path, logsizes[i]);
 
-            MPI_Barrier(MPI_COMM_WORLD);
-            c_mpi_read_start[i] = MPI_Wtime();
-            c_mpi_read_Vector(&v, fname, MPI_COMM_WORLD);
-            MPI_Barrier(MPI_COMM_WORLD);
-            c_mpi_read_stop[i] = MPI_Wtime();
-            c_mpi_read_time[i] += c_mpi_read_stop[i] - c_mpi_read_start[i];
+        //    MPI_Barrier(MPI_COMM_WORLD);
+        //    c_mpi_read_start[i] = MPI_Wtime();
+        //    c_mpi_read_Vector(&v, fname, MPI_COMM_WORLD);
+        //    MPI_Barrier(MPI_COMM_WORLD);
+        //    c_mpi_read_stop[i] = MPI_Wtime();
+        //    c_mpi_read_time[i] += c_mpi_read_stop[i] - c_mpi_read_start[i];
 
-            deallocate_Vector(&v);
-        }
-    }
+        //    deallocate_Vector(&v);
+       // }
+    //}
 
-    if(rank == 0){
-        printf("c-mpi read,   %d ", n_procs);
-        for(int i=0; i<n_sizes; i++){
-            c_mpi_read_time[i] /= n_trials;
-            printf("%f,\t", c_mpi_read_time[i]);
-        }
-        printf("\n");
-    }
+    //if(rank == 0){
+    //    printf("c-mpi read,   %d ", n_procs);
+    //    for(int i=0; i<n_sizes; i++){
+    //        c_mpi_read_time[i] /= n_trials;
+    //        printf("%f,\t", c_mpi_read_time[i]);
+    //    }
+    //    printf("\n");
+   // }
 
 
 
@@ -223,4 +223,4 @@ int main(int argc, char** argv){
     }
 	
     }
-}
+//}
